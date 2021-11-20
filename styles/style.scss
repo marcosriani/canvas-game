@@ -13,9 +13,13 @@ body {
     background-color: black;
 }
 
-canvas {
+#canvas {
     width: 600px;
     height: 400px;
     border: 2px solid rgb(143, 141, 141);
     background-color: white;
+}
+
+#cloud1, #cloud2, #cloud3, #bird1, #bird2, #bird3, #bird4{
+    display: none;
 }
