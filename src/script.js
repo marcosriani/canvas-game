@@ -7,11 +7,8 @@ let gameFrame = 0;
 // Images
 const cloudImage1 = document.querySelector('#cloud1');
 const cloudImage2 = document.querySelector('#cloud2');
-const cloudImage3 = document.querySelector('#cloud3');
 const birdImage1 = document.querySelector('#bird1');
 const birdImage2 = document.querySelector('#bird2');
-const birdImage3 = document.querySelector('#bird3');
-const birdImage4 = document.querySelector('#bird4');
 
 class Tree {
   constructor(canvasW, canvasH) {
@@ -32,10 +29,10 @@ class Tree {
   }
 }
 
-class CloudImage {
-  constructor(cloudImg) {
-    this.w = Math.floor(Math.random() * (70 - 50 + 1) + 50);
-    this.h = Math.floor(Math.random() * (65 - 45 + 1) + 50);
+class FlyingImages {
+  constructor(cloudImg, maxW, maxH, minW, minH) {
+    this.w = Math.floor(Math.random() * (maxW - minW + 1) + minW);
+    this.h = Math.floor(Math.random() * (maxH - minH + 1) + minH);
     this.speed = 1;
     this.x = 600;
     this.y = Math.floor(Math.random() * (150 - 0 + 1) + 0);
@@ -52,7 +49,7 @@ class CloudImage {
 }
 
 const arrayOfTrees = [];
-const arrayCloudImages = [];
+const arrayFlyingItems = [];
 
 const treeHandler = () => {
   if (gameFrame % 50 === 0) {
@@ -72,42 +69,76 @@ const treeHandler = () => {
   });
 };
 
-const cloudImageHandler = (images) => {
+const flyingImageHandler = (images, imageQuantity) => {
   // Make sure random images are displayed starting at index 0
-
   if (gameFrame % 350 === 0) {
-    const image = Math.floor(Math.random() * (6 - 0 + 1)) + 0;
+    const image = Math.floor(Math.random() * (imageQuantity - 0 + 1)) + 0;
 
-    console.log(image);
-
-    arrayCloudImages.push(new CloudImage(images[image]));
+    // Make sure the bird images are never too big
+    if (images[image].id === 'bird1' || images[image].id === 'bird2') {
+      arrayFlyingItems.push(new FlyingImages(images[image], 30, 25, 15, 20));
+    } else {
+      console.log(images[image]);
+      arrayFlyingItems.push(new FlyingImages(images[image], 70, 55, 50, 45));
+    }
   }
 
-  arrayCloudImages.forEach((cloudItem) => {
+  arrayFlyingItems.forEach((cloudItem) => {
     cloudItem.draw();
     cloudItem.update();
   });
 
   //   Check if the cloud has past the canvas border and removes it
-  arrayCloudImages.forEach((cloudItem, index) => {
+  arrayFlyingItems.forEach((cloudItem, index) => {
     if (cloudItem.x < -cloudItem.w) {
-      arrayCloudImages.splice(index, 1);
+      arrayFlyingItems.splice(index, 1);
     }
   });
 };
 
+const backgroundLayer1 = new Image();
+let gameSpeed = 1;
+backgroundLayer1.src = '../img/mid_ground_cloud_2.png';
+
+class Layer {
+  constructor(image, speedModifier) {
+    this.x = 0;
+    this.y = 0;
+    this.width = 2400;
+    this.height = 700;
+    this.image = image;
+    this.speedModifier = speedModifier;
+    this.speed = gameSpeed * this.speedModifier;
+  }
+
+  update() {
+    if (this.x <= -this.width) {
+      this.x = 0;
+    }
+
+    this.x = this.x - this.speed;
+  }
+
+  draw() {
+    ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    ctx.drawImage(
+      this.image,
+      this.x + this.width,
+      this.y,
+      this.width,
+      this.height
+    );
+  }
+}
+
+const layer1 = new Layer(backgroundLayer1, 0.5);
+
 const animation = () => {
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  layer1.update();
+  layer1.draw();
   treeHandler();
-  cloudImageHandler([
-    cloudImage1,
-    cloudImage2,
-    cloudImage3,
-    bird1,
-    bird2,
-    bird3,
-    bird4,
-  ]);
+  flyingImageHandler([cloudImage1, cloudImage2, bird1, bird2], 3);
   gameFrame += 1;
   requestAnimationFrame(animation);
 };
