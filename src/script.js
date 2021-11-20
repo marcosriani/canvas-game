@@ -173,8 +173,8 @@ window.addEventListener('keydown', (event) => {
 // Player
 class Player {
   constructor() {
-    this.x = 100;
-    this.y = 300;
+    this.x = CANVAS_WIDTH / 2;
+    this.y = CANVAS_HEIGHT / 2;
     this.radius = 20;
     this.speedX = 2;
     this.speedY = 2;
@@ -237,11 +237,22 @@ class Enemies {
     ctx.drawImage(this.image, this.x, this.y, this.w, this.h);
   }
 
+  detectWalls() {
+    //   Top wall
+    if (this.y < 0) {
+      console.log('top');
+      this.y -= 10;
+
+      //   GAME OVER
+    }
+  }
+
   update() {
     //   Makes sure the spaceship goes up slowly (Moves up and down, strong force to push up)
     moveUp = !moveUp;
 
     if (moveUp) {
+      //   this.y -= 2;
       this.y -= 0.995;
     } else {
       this.y += 0.6;
@@ -251,7 +262,7 @@ class Enemies {
 
 const handleEnemies = () => {
   for (let i = 0; i < 5; i++) {
-    enemiesArray.push(new Enemies(enemy2, 138 * i, 400));
+    enemiesArray.push(new Enemies(enemy2, 138 * i, 330));
   }
 };
 handleEnemies();
@@ -267,6 +278,7 @@ const animation = () => {
   enemiesArray.forEach((enemy) => {
     enemy.draw();
     enemy.update();
+    enemy.detectWalls();
   });
 
   player.draw();
