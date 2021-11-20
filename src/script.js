@@ -99,25 +99,107 @@ class Layer {
 const layer1 = new Layer(backgroundLayer1, 0.5);
 
 // Building the ground
+// class Ground {
+//   constructor() {
+//     this.x = 0;
+//     this.y = 320;
+//   }
+
+//   draw() {
+//     ctx.drawImage(ground, this.x, this.y, 600, 80);
+//   }
+// }
+
 class Ground {
   constructor() {
     this.x = 0;
-    this.y = 320;
+    this.y = 300;
+    this.speedX = 100;
+    this.speedY = 100;
   }
 
   draw() {
-    ctx.drawImage(ground, this.x, this.y, 600, 80);
+    ctx.drawImage(ground, this.x, this.y, 200, 100);
+  }
+
+  moveLeft() {
+    this.x -= this.speedX;
+  }
+
+  moveRight() {
+    this.x += this.speedX;
+  }
+
+  //   moveUp() {
+  //     if (this.y > 0 + this.radius) {
+  //       this.y -= this.speedY;
+  //     }
+  //   }
+
+  //   moveDown() {
+  //     if (this.y < CANVAS_HEIGHT - this.radius) {
+  //       this.y += this.speedY;
+  //     }
+  //   }
+
+  update() {
+    this.x;
   }
 }
 
 const buildGround = new Ground();
+
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'ArrowLeft') {
+    buildGround.moveLeft();
+  }
+
+  if (event.key === 'ArrowRight') {
+    buildGround.moveRight();
+  }
+
+  //   if (event.key === 'ArrowUp') {
+  //     buildGround.moveUp();
+  //   }
+  //   if (event.key === 'ArrowDown') {
+  //     buildGround.moveDown();
+  //   }
+});
+
+//  PREVENT CANVAS ELEMENT FROM SCROLLING WHILE KEYPRESSED
+// const keys = {};
+// window.addEventListener(
+//   'keydown',
+//   function (e) {
+//     keys[e.keyCode] = true;
+//     switch (e.keyCode) {
+//       case 37:
+//       case 39:
+//       case 38:
+//       case 40: // Arrow keys
+//       case 32:
+//         e.preventDefault();
+//         break; // Space
+//       default:
+//         break; // do not block other keys
+//     }
+//   },
+//   false
+// );
+// window.addEventListener(
+//   'keyup',
+//   function (e) {
+//     keys[e.keyCode] = false;
+//   },
+//   false
+// );
 
 // Player
 class Player {
   constructor() {
     this.x = 100;
     this.y = 300;
-    this.radius = 30;
+    this.radius = 20;
     this.speedX = 2;
     this.speedY = 2;
   }
@@ -134,13 +216,11 @@ class Player {
   detectWalls() {
     //   Left wall
     if (this.x - this.radius < 0) {
-      console.log('left');
       this.speedX++;
     }
 
     //   Right wall
     if (this.x + this.radius > CANVAS_WIDTH) {
-      console.log('righ');
       this.speedX--;
     }
 
@@ -155,26 +235,6 @@ class Player {
     }
   }
 
-  //   moveLeft() {
-  //     this.x -= this.speedX;
-  //   }
-
-  //   moveRight() {
-  //     this.x += this.speedX;
-  //   }
-
-  //   moveUp() {
-  //     if (this.y > 0 + this.radius) {
-  //       this.y -= this.speedY;
-  //     }
-  //   }
-
-  //   moveDown() {
-  //     if (this.y < CANVAS_HEIGHT - this.radius) {
-  //       this.y += this.speedY;
-  //     }
-  //   }
-
   update() {
     this.detectWalls();
     this.y -= this.speedY;
@@ -184,24 +244,9 @@ class Player {
 
 const player = new Player();
 
-// window.addEventListener('keydown', (event) => {
-//   if (event.key === 'ArrowLeft') {
-//     player.moveLeft();
-//   }
-
-//   if (event.key === 'ArrowRight') {
-//     player.moveRight();
-//   }
-
-//   if (event.key === 'ArrowUp') {
-//     console.log('up');
-
-//     player.moveUp();
-//   }
-//   if (event.key === 'ArrowDown') {
-//     player.moveDown();
-//   }
-// });
+class GamePlayer {
+  constructor() {}
+}
 
 const animation = () => {
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
