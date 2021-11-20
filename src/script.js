@@ -10,6 +10,8 @@ const cloudImage2 = document.querySelector('#cloud2');
 const birdImage1 = document.querySelector('#bird1');
 const birdImage2 = document.querySelector('#bird2');
 const ground = document.querySelector('#ground');
+const enemy1 = document.querySelector('#enemy1');
+const enemy2 = document.querySelector('#enemy2');
 
 class FlyingImages {
   constructor(cloudImg, maxW, maxH, minW, minH) {
@@ -98,49 +100,30 @@ class Layer {
 
 const layer1 = new Layer(backgroundLayer1, 0.5);
 
-// Building the ground
-// class Ground {
-//   constructor() {
-//     this.x = 0;
-//     this.y = 320;
-//   }
-
-//   draw() {
-//     ctx.drawImage(ground, this.x, this.y, 600, 80);
-//   }
-// }
-
 class Ground {
   constructor() {
     this.x = 0;
     this.y = 300;
     this.speedX = 100;
     this.speedY = 100;
+    this.size = 200;
   }
 
   draw() {
-    ctx.drawImage(ground, this.x, this.y, 200, 100);
+    ctx.drawImage(ground, this.x, this.y, this.size, 100);
   }
 
   moveLeft() {
-    this.x -= this.speedX;
+    if (this.x > 0) {
+      this.x -= this.speedX;
+    }
   }
 
   moveRight() {
-    this.x += this.speedX;
+    if (this.x < CANVAS_WIDTH - this.size) {
+      this.x += this.speedX;
+    }
   }
-
-  //   moveUp() {
-  //     if (this.y > 0 + this.radius) {
-  //       this.y -= this.speedY;
-  //     }
-  //   }
-
-  //   moveDown() {
-  //     if (this.y < CANVAS_HEIGHT - this.radius) {
-  //       this.y += this.speedY;
-  //     }
-  //   }
 
   update() {
     this.x;
@@ -157,13 +140,6 @@ window.addEventListener('keydown', (event) => {
   if (event.key === 'ArrowRight') {
     buildGround.moveRight();
   }
-
-  //   if (event.key === 'ArrowUp') {
-  //     buildGround.moveUp();
-  //   }
-  //   if (event.key === 'ArrowDown') {
-  //     buildGround.moveDown();
-  //   }
 });
 
 //  PREVENT CANVAS ELEMENT FROM SCROLLING WHILE KEYPRESSED
@@ -244,9 +220,41 @@ class Player {
 
 const player = new Player();
 
-class GamePlayer {
-  constructor() {}
+// ENEMIES
+let enemiesArray = [];
+let = moveUp = false;
+
+class Enemies {
+  constructor(image, x, y) {
+    this.image = image;
+    this.x = x;
+    this.y = y;
+    this.w = 50;
+    this.h = 50;
+  }
+
+  draw() {
+    ctx.drawImage(this.image, this.x, this.y, this.w, this.h);
+  }
+
+  update() {
+    //   Makes sure the spaceship goes up slowly (Moves up and down, strong force to push up)
+    moveUp = !moveUp;
+
+    if (moveUp) {
+      this.y -= 0.995;
+    } else {
+      this.y += 0.6;
+    }
+  }
 }
+
+const handleEnemies = () => {
+  for (let i = 0; i < 5; i++) {
+    enemiesArray.push(new Enemies(enemy2, 138 * i, 400));
+  }
+};
+handleEnemies();
 
 const animation = () => {
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -254,6 +262,13 @@ const animation = () => {
   layer1.update();
   flyingImageHandler([cloudImage1, cloudImage2, bird1, bird2], 3);
   buildGround.draw();
+
+  //  Enemies
+  enemiesArray.forEach((enemy) => {
+    enemy.draw();
+    enemy.update();
+  });
+
   player.draw();
   player.update();
   gameFrame += 1;
