@@ -17,7 +17,7 @@ class FlyingImages {
     this.h = Math.floor(Math.random() * (maxH - minH + 1) + minH);
     this.speed = Math.floor(Math.random() * (3 - 2 + 1) + 2);
     this.x = 600;
-    this.y = Math.floor(Math.random() * (150 - 0 + 1) + 0);
+    this.y = Math.floor(Math.random() * (250 - 0 + 1) + 0);
     this.cloudImg = cloudImg;
   }
 
@@ -39,10 +39,9 @@ const flyingImageHandler = (images, imageQuantity) => {
 
     // Make sure the bird images are never too big
     if (images[image].id === 'bird1' || images[image].id === 'bird2') {
-      arrayFlyingItems.push(new FlyingImages(images[image], 30, 25, 15, 20));
+      arrayFlyingItems.push(new FlyingImages(images[image], 40, 35, 15, 20));
     } else {
-      console.log(images[image]);
-      arrayFlyingItems.push(new FlyingImages(images[image], 70, 55, 50, 45));
+      arrayFlyingItems.push(new FlyingImages(images[image], 90, 75, 50, 45));
     }
   }
 
@@ -113,12 +112,103 @@ class Ground {
 
 const buildGround = new Ground();
 
+// Player
+class Player {
+  constructor() {
+    this.x = 100;
+    this.y = 300;
+    this.radius = 30;
+    this.speedX = 150;
+    this.speedY = 150;
+  }
+
+  draw() {
+    ctx.beginPath();
+    ctx.fillStyle = 'salmon';
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  detectWalls() {
+    // Left wall
+    if (this.x < 0) {
+      this.speedX--;
+      this.speedY--;
+    }
+
+    //   Right wall
+    if (this.x + this.w > canvas.width) {
+      this.x = canvas.width - this.w;
+    }
+
+    //   Top wall
+    if (this.y < 0 + this.radius) {
+      this.speedX--;
+      this.speedY--;
+    }
+
+    //  Bottom wall
+    if (this.y + this.radius + 20 > canvas.height) {
+      this.speedX++;
+      this.speedY++;
+    }
+  }
+
+  moveLeft() {
+    this.x -= this.speedX;
+  }
+
+  moveRight() {
+    this.x += this.speedX;
+  }
+
+  moveUp() {
+    this.y -= this.speedY;
+  }
+
+  moveDown() {
+    this.y += this.speedY;
+  }
+
+  update() {
+    this.detectWalls();
+    // this.y -= this.speedY;
+  }
+}
+
+const player = new Player();
+
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'ArrowLeft') {
+    console.log('left');
+
+    player.moveLeft();
+  }
+
+  if (event.key === 'ArrowRight') {
+    player.moveRight();
+  }
+
+  if (event.key === 'ArrowUp') {
+    console.log('up');
+
+    player.moveUp();
+  }
+  if (event.key === 'ArrowDown') {
+    player.moveDown();
+  }
+});
+
 const animation = () => {
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   layer1.draw();
   layer1.update();
   flyingImageHandler([cloudImage1, cloudImage2, bird1, bird2], 3);
   buildGround.draw();
+  player.draw();
+  player.update();
   gameFrame += 1;
   requestAnimationFrame(animation);
 };
