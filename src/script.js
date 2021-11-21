@@ -9,9 +9,8 @@ let gameFrame = 0;
 // Images
 const cloudImage1 = document.querySelector('#cloud1');
 const cloudImage2 = document.querySelector('#cloud2');
-const birdImage1 = document.querySelector('#bird1');
-const birdImage2 = document.querySelector('#bird2');
 const ground = document.querySelector('#ground');
+const ground2 = document.querySelector('#ground2');
 const enemy1 = document.querySelector('#enemy1');
 const enemy2 = document.querySelector('#enemy2');
 
@@ -102,11 +101,12 @@ class Ground {
     this.y = 300;
     this.speedX = 100;
     this.speedY = 100;
-    this.size = 200;
+    this.w = 200;
+    this.h = 100;
   }
 
   draw() {
-    ctx.drawImage(ground, this.x, this.y, this.size, 100);
+    ctx.drawImage(ground, this.x, this.y, this.w, this.h);
   }
 
   moveLeft() {
@@ -116,10 +116,22 @@ class Ground {
   }
 
   moveRight() {
-    if (this.x < CANVAS_WIDTH - this.size) {
+    if (this.x < CANVAS_WIDTH - this.w) {
       this.x += this.speedX;
     }
   }
+
+  detectCollision = (player) => {
+    if (
+      player.y + player.radius === this.y + this.h &&
+      player.x + player.radius <= this.x + this.w
+    ) {
+      //   console.log('true');
+      return true;
+    } else {
+      return false;
+    }
+  };
 
   update() {
     this.x;
@@ -127,6 +139,26 @@ class Ground {
 }
 
 const buildGround = new Ground();
+
+class EndGround {
+  constructor() {
+    this.x = 0;
+    this.y = 330;
+    this.w = CANVAS_WIDTH;
+    this.h = 100;
+    this.speed = 0.4;
+  }
+
+  draw() {
+    ctx.drawImage(ground2, this.x, this.y, this.w, this.h);
+  }
+
+  update() {
+    this.y += this.speed;
+  }
+}
+
+const buildEndGround = new EndGround();
 
 window.addEventListener('keydown', (event) => {
   if (event.key === 'ArrowLeft') {
@@ -175,13 +207,42 @@ class Player {
     }
 
     //  Bottom wall
-    if (this.y + this.radius + 20 > canvas.height) {
-      this.speedY++;
+    // if (this.y + this.radius + 20 > canvas.height) {
+    if (this.y + this.radius > canvas.height) {
+      console.log('GAME OVER');
+      //   this.speedY++;
     }
   }
 
-  update() {
+  detectCollisionBar = (paddleBar) => {
+    let bottomOfBall = this.y + this.radius;
+    let topOfBall = this.y - this.radius;
+
+    let topOfObject = paddleBar.y + 80;
+    let leftSideOfObject = paddleBar.x;
+    let rightSideOfObject = paddleBar.x + paddleBar.w;
+    let bottomOfObject = paddleBar.y + paddleBar.h;
+
+    if (
+      bottomOfBall >= topOfObject &&
+      topOfBall <= bottomOfObject &&
+      this.x >= leftSideOfObject &&
+      this.x + this.radius <= rightSideOfObject
+    ) {
+      //   if (this.y + this.radius + 20 > canvas.height) {
+      this.speedY++;
+      //   }
+
+      //   this.speedY++;
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  update(bar) {
     this.detectWalls();
+    this.detectCollisionBar(bar);
     this.y -= this.speedY;
     this.x += this.speedX;
   }
@@ -276,7 +337,13 @@ const animation = () => {
   handleEnemies(player);
 
   player.draw();
-  player.update();
+  player.update(buildGround);
+  //   player.detectCollisionBar(buildGround);
+  buildGround.detectCollision(player);
+
+  //   Build the clouds that goes away when we start the game
+  buildEndGround.draw();
+  buildEndGround.update();
   gameFrame += 1;
   requestAnimationFrame(animation);
 };
