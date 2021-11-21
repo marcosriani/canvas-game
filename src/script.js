@@ -226,12 +226,17 @@ class Enemies {
 
   detectCollision = (player) => {
     let bottomOfBall = player.y + player.radius;
-    let topOfBall = player.y;
+    let topOfBall = player.y - player.radius;
 
     let topOfObject = this.y;
     let leftSideOfObject = this.x;
     let rightSideOfObject = this.x + this.w;
     let bottomOfObject = this.y + this.h;
+
+    // if (topOfBall <= bottomOfObject) {
+    //   console.log(bottomOfObject);
+    //   console.log(topOfBall);
+    // }
 
     if (
       bottomOfBall >= topOfObject &&
