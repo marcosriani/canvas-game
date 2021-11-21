@@ -21,7 +21,7 @@ class FlyingImages {
     this.h = Math.floor(Math.random() * (maxH - minH + 1) + minH);
     this.speed = Math.floor(Math.random() * (3 - 2 + 1) + 2);
     this.x = 600;
-    this.y = Math.floor(Math.random() * (250 - 0 + 1) + 0);
+    this.y = Math.floor(Math.random() * (300 - 0 + 1) + 0);
     this.cloudImg = cloudImg;
   }
 
@@ -38,15 +38,9 @@ const arrayFlyingItems = [];
 
 const flyingImageHandler = (images, imageQuantity) => {
   // Make sure random images are displayed starting at index 0
-  if (gameFrame % 350 === 0) {
+  if (gameFrame % 100 === 0) {
     const image = Math.floor(Math.random() * (imageQuantity - 0 + 1)) + 0;
-
-    // Make sure the bird images are never too big
-    if (images[image].id === 'bird1' || images[image].id === 'bird2') {
-      arrayFlyingItems.push(new FlyingImages(images[image], 40, 35, 15, 20));
-    } else {
-      arrayFlyingItems.push(new FlyingImages(images[image], 90, 75, 50, 45));
-    }
+    arrayFlyingItems.push(new FlyingImages(images[image], 100, 90, 50, 45));
   }
 
   arrayFlyingItems.forEach((cloudItem) => {
@@ -207,8 +201,6 @@ class Enemies {
     this.w = 50;
     this.h = 50;
     this.dx = 0.995;
-    // this.distance;
-    // this.hit = false;
   }
 
   draw() {
@@ -233,18 +225,12 @@ class Enemies {
     let rightSideOfObject = this.x + this.w;
     let bottomOfObject = this.y + this.h;
 
-    // if (topOfBall <= bottomOfObject) {
-    //   console.log(bottomOfObject);
-    //   console.log(topOfBall);
-    // }
-
     if (
       bottomOfBall >= topOfObject &&
       topOfBall <= bottomOfObject &&
       player.x >= leftSideOfObject &&
       player.x + player.radius <= rightSideOfObject
     ) {
-      console.log('hi');
       return true;
     } else {
       return false;
@@ -252,16 +238,6 @@ class Enemies {
   };
 
   update() {
-    //   Makes sure the spaceship goes up slowly (Moves up and down, strong force to push up)
-    moveUp = !moveUp;
-
-    // if (moveUp) {
-    //   //   this.y -= 2;
-    //   this.y -= this.dx;
-    // } else {
-    //   this.y += 0.6;
-    // }
-
     this.y -= 0.1;
   }
 }
@@ -271,16 +247,18 @@ for (let i = 0; i < 5; i++) {
 }
 
 const handleEnemies = (player) => {
-  enemiesArray.forEach((enemy, index) => {
+  enemiesArray.forEach((enemy) => {
     if (enemy) {
       enemy.draw();
       enemy.update();
       enemy.detectWalls();
+    }
+  });
 
-      //   console.log(enemiesArray.length);
-
+  //   Make sure the touched enemy is removed and the others don't blink
+  enemiesArray.forEach((enemy, index) => {
+    if (enemy) {
       if (enemy.detectCollision(player)) {
-        // console.log(enemiesArray.length);
         enemiesArray.splice(index, 1);
       }
     }
@@ -291,7 +269,7 @@ const animation = () => {
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   layer1.draw();
   layer1.update();
-  flyingImageHandler([cloudImage1, cloudImage2, bird1, bird2], 3);
+  flyingImageHandler([cloudImage1, cloudImage2], 1);
   buildGround.draw();
 
   //  Enemies
