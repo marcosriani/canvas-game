@@ -17,6 +17,7 @@ let win = false;
 let score = 0;
 let gameLevel = radioButtonLevel1.value;
 
+// Controls for the game level
 radioButtonLevel1.addEventListener('click', () => {
   gameLevel = radioButtonLevel1.value;
 });
@@ -26,15 +27,6 @@ radioButtonLevel2.addEventListener('click', () => {
 radioButtonLevel3.addEventListener('click', () => {
   gameLevel = radioButtonLevel3.value;
 });
-
-// Controls for the game level
-if (radioButtonLevel1.checked) {
-  console.log('Level1');
-} else if (radioButtonLevel2.checked) {
-  console.log('Level2');
-} else if (radioButtonLevel3.checked) {
-  console.log('Level3');
-}
 
 // Score controls
 const scoreParagraph = document.querySelector('.score__paragraph');
@@ -47,6 +39,10 @@ const ground = document.querySelector('#ground');
 const ground2 = document.querySelector('#ground2');
 const enemy1 = document.querySelector('#enemy1');
 const enemy2 = document.querySelector('#enemy2');
+
+const explosionAudio = document.createElement('audio');
+explosionAudio.src =
+  '../audio/esm_8bit_explosion_bomb_boom_blast_cannon_retro_old_school_classic_cartoon.mp3';
 
 class FlyingImages {
   constructor(cloudImg, maxW, maxH, minW, minH) {
@@ -336,7 +332,6 @@ class Enemies {
   };
 
   update() {
-    // this.y -= 0.1;
     this.y -= gameLevel;
   }
 }
@@ -358,6 +353,7 @@ const handleEnemies = (player) => {
   enemiesArray.forEach((enemy, index) => {
     if (enemy) {
       if (enemy.detectCollision(player)) {
+        explosionAudio.play();
         enemiesArray.splice(index, 1);
         score++;
         if (score < 5) {
