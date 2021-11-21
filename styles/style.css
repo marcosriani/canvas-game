@@ -29,6 +29,29 @@ body {
   background-color: white;
 }
 
-#cloud1, #cloud2, #ground, #ground2, #ground3, #enemy1, #enemy2 {
+#cloud1, #cloud2, #ground, #ground2, #enemy1, #enemy2 {
   display: none;
+}
+
+.score {
+  margin: 10px;
+  font-size: 25px;
+}
+
+#control {
+  padding: 10px;
+  background-color: #3a3838;
+  display: flex;
+}
+
+.control__div {
+  padding: 5px;
+}
+.control__div .control__paragraph {
+  color: salmon;
+}
+
+.label {
+  color: white;
+  padding: 10px;
 }

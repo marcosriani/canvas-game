@@ -31,3 +31,27 @@ body {
 #cloud1, #cloud2,  #ground, #ground2, #enemy1, #enemy2{
     display: none;
 }
+
+.score {
+    margin: 10px;
+    font-size: 25px;
+}
+
+#control {
+    padding: 10px;
+    background-color:rgb(58, 56, 56);
+    display: flex;
+}
+
+.control__div {
+    padding: 5px;
+    .control__paragraph {
+        color: salmon;
+    }
+}
+
+.label {
+    color: white;
+    padding: 10px
+}
+

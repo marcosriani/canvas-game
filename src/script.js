@@ -4,12 +4,41 @@ ctx.canvas.width = window.innerWidth;
 ctx.canvas.height = window.innerHeight;
 const CANVAS_WIDTH = (canvas.width = 600);
 const CANVAS_HEIGHT = (canvas.height = 400);
+
+// Select buttons on the home page
+const radioButtonLevel1 = document.getElementById('level1');
+const radioButtonLevel2 = document.getElementById('level2');
+const radioButtonLevel3 = document.getElementById('level3');
+
 let gameFrame = 0;
 let gameStarted = false;
 let gameOver = false;
 let win = false;
-let gameLevel = 0.05;
-// let gameLevel = [0.05, 0.1, 0.3];
+let score = 0;
+let gameLevel = radioButtonLevel1.value;
+
+radioButtonLevel1.addEventListener('click', () => {
+  gameLevel = radioButtonLevel1.value;
+});
+radioButtonLevel2.addEventListener('click', () => {
+  gameLevel = radioButtonLevel2.value;
+});
+radioButtonLevel3.addEventListener('click', () => {
+  gameLevel = radioButtonLevel3.value;
+});
+
+// Controls for the game level
+if (radioButtonLevel1.checked) {
+  console.log('Level1');
+} else if (radioButtonLevel2.checked) {
+  console.log('Level2');
+} else if (radioButtonLevel3.checked) {
+  console.log('Level3');
+}
+
+// Score controls
+const scoreParagraph = document.querySelector('.score__paragraph');
+const scoreSpan = document.querySelector('.score__span');
 
 // Images
 const cloudImage1 = document.querySelector('#cloud1');
@@ -176,6 +205,9 @@ window.addEventListener('keydown', (event) => {
 
   if (event.key === ' ') {
     gameStarted = !gameStarted;
+    if (gameStarted) {
+      scoreParagraph.style.color = 'white';
+    }
   }
 });
 
@@ -327,6 +359,12 @@ const handleEnemies = (player) => {
     if (enemy) {
       if (enemy.detectCollision(player)) {
         enemiesArray.splice(index, 1);
+        score++;
+        if (score < 5) {
+          scoreSpan.innerHTML = score;
+        } else if (score === 5) {
+          scoreSpan.innerHTML = `${score} - You are a winner!`;
+        }
       }
     }
   });
@@ -370,7 +408,11 @@ class Start {
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     ctx.font = '30px Arial';
     ctx.fillStyle = 'white';
-    ctx.fillText('PRESS SPACE TO START', CANVAS_WIDTH / 5, CANVAS_HEIGHT / 2);
+    ctx.fillText(
+      'PRESS SPACE KEY TO START',
+      CANVAS_WIDTH / 6.5,
+      CANVAS_HEIGHT / 2
+    );
   }
 }
 
@@ -378,15 +420,14 @@ const startGame = new Start();
 
 const restartGame = () => {
   // Game will restart automatically after a few sec
-  if (gameOver) {
+  if (gameOver || win) {
     setTimeout(() => {
       location.reload();
-    }, 4000);
+    }, 3000);
   }
 };
 
 const animation = () => {
-  console.log(gameStarted);
   if (!gameStarted) {
     startGame.draw();
   } else {
