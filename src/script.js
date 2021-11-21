@@ -5,6 +5,9 @@ ctx.canvas.height = window.innerHeight;
 const CANVAS_WIDTH = (canvas.width = 600);
 const CANVAS_HEIGHT = (canvas.height = 400);
 let gameFrame = 0;
+let startGame = false;
+let gameOver = false;
+let win = false;
 
 // Images
 const cloudImage1 = document.querySelector('#cloud1');
@@ -208,8 +211,9 @@ class Player {
 
     //  Bottom wall
     // if (this.y + this.radius + 20 > canvas.height) {
-    if (this.y + this.radius > canvas.height) {
-      console.log('GAME OVER');
+    if (this.y + this.radius > canvas.height + this.radius) {
+      gameOver = true;
+
       //   this.speedY++;
     }
   }
@@ -218,6 +222,7 @@ class Player {
     let bottomOfBall = this.y + this.radius;
     let topOfBall = this.y - this.radius;
 
+    // Hardcoded value due to complications on the ground image position
     let topOfObject = paddleBar.y + 80;
     let leftSideOfObject = paddleBar.x;
     let rightSideOfObject = paddleBar.x + paddleBar.w;
@@ -229,14 +234,7 @@ class Player {
       this.x >= leftSideOfObject &&
       this.x + this.radius <= rightSideOfObject
     ) {
-      //   if (this.y + this.radius + 20 > canvas.height) {
       this.speedY++;
-      //   }
-
-      //   this.speedY++;
-      return true;
-    } else {
-      return false;
     }
   };
 
@@ -274,6 +272,7 @@ class Enemies {
       this.y -= 10;
 
       //   GAME OVER
+      gameOver = true;
     }
   }
 
@@ -299,7 +298,8 @@ class Enemies {
   };
 
   update() {
-    this.y -= 0.1;
+    // this.y -= 0.1;
+    this.y -= 0.05;
   }
 }
 
@@ -324,7 +324,36 @@ const handleEnemies = (player) => {
       }
     }
   });
+
+  if (enemiesArray.length === 0) {
+    win = true;
+  }
 };
+
+// Game Over
+class GameOver {
+  constructor(message, background, centralSpace) {
+    this.message = message;
+    this.background = background;
+    this.centralSpace = centralSpace;
+  }
+
+  draw() {
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    ctx.fillStyle = this.background;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    ctx.font = '30px Arial';
+    ctx.fillStyle = 'white';
+    ctx.fillText(
+      this.message,
+      CANVAS_WIDTH / this.centralSpace,
+      CANVAS_HEIGHT / 2
+    );
+  }
+}
+
+const endOfGame = new GameOver('GAME OVER', 'black', 3);
+const winGame = new GameOver('YOU WIN!', 'salmon', 2.5);
 
 const animation = () => {
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -345,6 +374,9 @@ const animation = () => {
   buildEndGround.draw();
   buildEndGround.update();
   gameFrame += 1;
+
+  gameOver && endOfGame.draw();
+  win && winGame.draw();
   requestAnimationFrame(animation);
 };
 
