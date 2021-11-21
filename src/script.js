@@ -5,9 +5,11 @@ ctx.canvas.height = window.innerHeight;
 const CANVAS_WIDTH = (canvas.width = 600);
 const CANVAS_HEIGHT = (canvas.height = 400);
 let gameFrame = 0;
-let startGame = false;
+let gameStarted = false;
 let gameOver = false;
 let win = false;
+let gameLevel = 0.05;
+// let gameLevel = [0.05, 0.1, 0.3];
 
 // Images
 const cloudImage1 = document.querySelector('#cloud1');
@@ -171,6 +173,10 @@ window.addEventListener('keydown', (event) => {
   if (event.key === 'ArrowRight') {
     buildGround.moveRight();
   }
+
+  if (event.key === ' ') {
+    gameStarted = !gameStarted;
+  }
 });
 
 // Player
@@ -299,7 +305,7 @@ class Enemies {
 
   update() {
     // this.y -= 0.1;
-    this.y -= 0.05;
+    this.y -= gameLevel;
   }
 }
 
@@ -355,28 +361,55 @@ class GameOver {
 const endOfGame = new GameOver('GAME OVER', 'black', 3);
 const winGame = new GameOver('YOU WIN!', 'salmon', 2.5);
 
+class Start {
+  constructor() {}
+
+  draw() {
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    ctx.fillStyle = 'orange';
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    ctx.font = '30px Arial';
+    ctx.fillStyle = 'white';
+    ctx.fillText('PRESS SPACE TO START', CANVAS_WIDTH / 5, CANVAS_HEIGHT / 2);
+  }
+}
+
+const startGame = new Start();
+
+const restartGame = () => {
+  // Game will restart automatically after a few sec
+  if (gameOver) {
+    setTimeout(() => {
+      location.reload();
+    }, 4000);
+  }
+};
+
 const animation = () => {
-  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  layer1.draw();
-  layer1.update();
-  flyingImageHandler([cloudImage1, cloudImage2], 1);
-  buildGround.draw();
+  console.log(gameStarted);
+  if (!gameStarted) {
+    startGame.draw();
+  } else {
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    layer1.draw();
+    layer1.update();
+    flyingImageHandler([cloudImage1, cloudImage2], 1);
+    buildGround.draw();
+    //  Enemies
+    handleEnemies(player);
+    player.draw();
+    player.update(buildGround);
+    //   player.detectCollisionBar(buildGround);
+    buildGround.detectCollision(player);
+    //   Build the clouds that goes away when we start the game
+    buildEndGround.draw();
+    buildEndGround.update();
+    gameFrame += 1;
+    gameOver && endOfGame.draw();
+    win && winGame.draw();
+    restartGame();
+  }
 
-  //  Enemies
-  handleEnemies(player);
-
-  player.draw();
-  player.update(buildGround);
-  //   player.detectCollisionBar(buildGround);
-  buildGround.detectCollision(player);
-
-  //   Build the clouds that goes away when we start the game
-  buildEndGround.draw();
-  buildEndGround.update();
-  gameFrame += 1;
-
-  gameOver && endOfGame.draw();
-  win && winGame.draw();
   requestAnimationFrame(animation);
 };
 
