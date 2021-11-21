@@ -1,5 +1,7 @@
 const canvas = document.querySelector('#canvas');
 const ctx = canvas.getContext('2d');
+ctx.canvas.width = window.innerWidth;
+ctx.canvas.height = window.innerHeight;
 const CANVAS_WIDTH = (canvas.width = 600);
 const CANVAS_HEIGHT = (canvas.height = 400);
 let gameFrame = 0;
@@ -142,34 +144,6 @@ window.addEventListener('keydown', (event) => {
   }
 });
 
-//  PREVENT CANVAS ELEMENT FROM SCROLLING WHILE KEYPRESSED
-// const keys = {};
-// window.addEventListener(
-//   'keydown',
-//   function (e) {
-//     keys[e.keyCode] = true;
-//     switch (e.keyCode) {
-//       case 37:
-//       case 39:
-//       case 38:
-//       case 40: // Arrow keys
-//       case 32:
-//         e.preventDefault();
-//         break; // Space
-//       default:
-//         break; // do not block other keys
-//     }
-//   },
-//   false
-// );
-// window.addEventListener(
-//   'keyup',
-//   function (e) {
-//     keys[e.keyCode] = false;
-//   },
-//   false
-// );
-
 // Player
 class Player {
   constructor() {
@@ -187,6 +161,7 @@ class Player {
     ctx.fill();
     ctx.closePath();
     ctx.stroke();
+    ctx.restore();
   }
 
   detectWalls() {
@@ -231,6 +206,9 @@ class Enemies {
     this.y = y;
     this.w = 50;
     this.h = 50;
+    this.dx = 0.995;
+    // this.distance;
+    // this.hit = false;
   }
 
   draw() {
@@ -240,32 +218,69 @@ class Enemies {
   detectWalls() {
     //   Top wall
     if (this.y < 0) {
-      console.log('top');
       this.y -= 10;
 
       //   GAME OVER
     }
   }
 
+  detectCollision = (player) => {
+    let bottomOfBall = player.y + player.radius;
+    let topOfBall = player.y;
+
+    let topOfObject = this.y;
+    let leftSideOfObject = this.x;
+    let rightSideOfObject = this.x + this.w;
+    let bottomOfObject = this.y + this.h;
+
+    if (
+      bottomOfBall >= topOfObject &&
+      topOfBall <= bottomOfObject &&
+      player.x >= leftSideOfObject &&
+      player.x + player.radius <= rightSideOfObject
+    ) {
+      console.log('hi');
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   update() {
     //   Makes sure the spaceship goes up slowly (Moves up and down, strong force to push up)
     moveUp = !moveUp;
 
-    if (moveUp) {
-      //   this.y -= 2;
-      this.y -= 0.995;
-    } else {
-      this.y += 0.6;
-    }
+    // if (moveUp) {
+    //   //   this.y -= 2;
+    //   this.y -= this.dx;
+    // } else {
+    //   this.y += 0.6;
+    // }
+
+    this.y -= 0.1;
   }
 }
 
-const handleEnemies = () => {
-  for (let i = 0; i < 5; i++) {
-    enemiesArray.push(new Enemies(enemy2, 138 * i, 330));
-  }
+for (let i = 0; i < 5; i++) {
+  enemiesArray.push(new Enemies(enemy2, 138 * i, 330));
+}
+
+const handleEnemies = (player) => {
+  enemiesArray.forEach((enemy, index) => {
+    if (enemy) {
+      enemy.draw();
+      enemy.update();
+      enemy.detectWalls();
+
+      //   console.log(enemiesArray.length);
+
+      if (enemy.detectCollision(player)) {
+        // console.log(enemiesArray.length);
+        enemiesArray.splice(index, 1);
+      }
+    }
+  });
 };
-handleEnemies();
 
 const animation = () => {
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -275,11 +290,7 @@ const animation = () => {
   buildGround.draw();
 
   //  Enemies
-  enemiesArray.forEach((enemy) => {
-    enemy.draw();
-    enemy.update();
-    enemy.detectWalls();
-  });
+  handleEnemies(player);
 
   player.draw();
   player.update();
