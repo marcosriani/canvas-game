@@ -40,36 +40,37 @@ const ground2 = document.querySelector('#ground2');
 const enemy1 = document.querySelector('#enemy1');
 const enemy2 = document.querySelector('#enemy2');
 
+// Audio
+const spaceshipFlying = document.createElement('audio');
+spaceshipFlying.src = '../audio/mixkit-explosion-hit-1704.wav';
+
+const audioBackground = document.createElement('audio');
+audioBackground.src = '../audio/PM_FSSF_AMBIENCE_SOUNDSCAPE_LOOP_3.mp3';
+
 const explosionAudio = document.createElement('audio');
 explosionAudio.src =
   '../audio/esm_8bit_explosion_bomb_boom_blast_cannon_retro_old_school_classic_cartoon.mp3';
 
-class FlyingImages {
-  constructor(cloudImg, maxW, maxH, minW, minH) {
-    this.w = Math.floor(Math.random() * (maxW - minW + 1) + minW);
-    this.h = Math.floor(Math.random() * (maxH - minH + 1) + minH);
-    this.speed = Math.floor(Math.random() * (3 - 2 + 1) + 2);
-    this.x = CANVAS_WIDTH;
-    this.y = Math.floor(Math.random() * (300 - 0 + 1) + 0);
-    this.cloudImg = cloudImg;
-  }
+//   Importing classes
+import FlyingImages from './flyingImages.js';
+import Layer from './layer.js';
+import Ground from './Ground.js';
+import EndGround from './EndGround.js';
+import Player from './Player.js';
+import Enemies from './enemies.js';
+import GameOver from './GameOver.js';
+import Start from './Start.js';
 
-  draw() {
-    ctx.drawImage(this.cloudImg, this.x, this.y, this.w, this.h);
-  }
-
-  update() {
-    this.x -= this.speed;
-  }
-}
-
+// FLYING CLOUDS
 const arrayFlyingItems = [];
 
 const flyingImageHandler = (images, imageQuantity) => {
   // Make sure random images are displayed starting at index 0
   if (gameFrame % 100 === 0) {
     const image = Math.floor(Math.random() * (imageQuantity - 0 + 1)) + 0;
-    arrayFlyingItems.push(new FlyingImages(images[image], 100, 90, 50, 45));
+    arrayFlyingItems.push(
+      new FlyingImages(images[image], 100, 90, 50, 45, CANVAS_WIDTH, ctx)
+    );
   }
 
   arrayFlyingItems.forEach((cloudItem) => {
@@ -89,265 +90,32 @@ const flyingImageHandler = (images, imageQuantity) => {
 let gameSpeed = 1;
 const backgroundLayer1 = new Image();
 backgroundLayer1.src = '../img/mid_ground_cloud_2.png';
-const backgroundLayer2 = new Image();
-backgroundLayer2.src = '../img/ground.png';
 
-class Layer {
-  constructor(image, speedModifier) {
-    this.x = 0;
-    this.y = 0;
-    this.width = 2400;
-    this.height = 700;
-    this.image = image;
-    this.speedModifier = speedModifier;
-    this.speed = gameSpeed * this.speedModifier;
-  }
+const layer1 = new Layer(backgroundLayer1, 0.5, gameSpeed, ctx);
 
-  update() {
-    if (this.x <= -this.width) {
-      this.x = 0;
-    }
+// BACKGROUND GROUND - PADDLE
+const buildGround = new Ground(CANVAS_WIDTH, CANVAS_HEIGHT, ground, ctx);
 
-    this.x = this.x - this.speed;
-  }
+// CLOUDS THAT SHOW WHEN THE GAME STARTS
+const buildEndGround = new EndGround(CANVAS_WIDTH, ground2, ctx);
 
-  draw() {
-    ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-    ctx.drawImage(
-      this.image,
-      this.x + this.width,
-      this.y,
-      this.width,
-      this.height
-    );
-  }
-}
-
-const layer1 = new Layer(backgroundLayer1, 0.5);
-
-class Ground {
-  constructor() {
-    this.x = 0;
-    this.y = CANVAS_HEIGHT / 1.5;
-    this.speedX = 100;
-    this.speedY = 100;
-    this.w = 200;
-    this.h = 100;
-  }
-
-  draw() {
-    ctx.drawImage(ground, this.x, this.y, this.w, this.h);
-  }
-
-  moveLeft() {
-    if (this.x > 0) {
-      this.x -= this.speedX;
-    }
-  }
-
-  moveRight() {
-    if (this.x < CANVAS_WIDTH - this.w) {
-      this.x += this.speedX;
-    }
-  }
-
-  detectCollision = (player) => {
-    if (
-      player.y + player.radius === this.y + this.h &&
-      player.x + player.radius <= this.x + this.w
-    ) {
-      //   console.log('true');
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  update() {
-    this.x;
-  }
-}
-
-const buildGround = new Ground();
-
-class EndGround {
-  constructor() {
-    this.x = 0;
-    this.y = 330;
-    this.w = CANVAS_WIDTH;
-    this.h = 100;
-    this.speed = 0.4;
-  }
-
-  draw() {
-    ctx.drawImage(ground2, this.x, this.y, this.w, this.h);
-  }
-
-  update() {
-    this.y += this.speed;
-  }
-}
-
-const buildEndGround = new EndGround();
-
-window.addEventListener('keydown', (event) => {
-  if (event.key === 'ArrowLeft') {
-    buildGround.moveLeft();
-  }
-
-  if (event.key === 'ArrowRight') {
-    buildGround.moveRight();
-  }
-
-  if (event.key === ' ') {
-    gameStarted = !gameStarted;
-    if (gameStarted) {
-      scoreParagraph.style.color = 'white';
-    }
-  }
-});
-
-// Player
-class Player {
-  constructor() {
-    this.x = CANVAS_WIDTH / 2;
-    this.y = CANVAS_HEIGHT / 2;
-    this.radius = 20;
-    this.speedX = 2;
-    this.speedY = 2;
-  }
-
-  draw() {
-    ctx.beginPath();
-    ctx.fillStyle = 'salmon';
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.closePath();
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  detectWalls() {
-    //   Left wall
-    if (this.x - this.radius < 0) {
-      this.speedX++;
-    }
-
-    //   Right wall
-    if (this.x + this.radius > CANVAS_WIDTH) {
-      this.speedX--;
-    }
-
-    //   Top wall
-    if (this.y < 0 + this.radius) {
-      this.speedY--;
-    }
-
-    //  Bottom wall
-    // if (this.y + this.radius + 20 > canvas.height) {
-    if (this.y + this.radius > canvas.height + this.radius) {
-      gameOver = true;
-
-      //   this.speedY++;
-    }
-  }
-
-  detectCollisionBar = (paddleBar) => {
-    let bottomOfBall = this.y + this.radius;
-    let topOfBall = this.y - this.radius;
-
-    // Hardcoded value due to complications on the ground image position
-    // let topOfObject = paddleBar.y + 80;
-    let topOfObject = paddleBar.y + 77;
-    let leftSideOfObject = paddleBar.x;
-    let rightSideOfObject = paddleBar.x + paddleBar.w;
-    let bottomOfObject = paddleBar.y + paddleBar.h;
-
-    if (
-      bottomOfBall >= topOfObject &&
-      topOfBall <= bottomOfObject &&
-      this.x >= leftSideOfObject &&
-      this.x + this.radius <= rightSideOfObject
-    ) {
-      this.speedY++;
-    }
-  };
-
-  update(bar) {
-    this.detectWalls();
-    this.detectCollisionBar(bar);
-    this.y -= this.speedY;
-    this.x += this.speedX;
-  }
-}
-
-const player = new Player();
+// PLAYER KICKING BALL
+const player = new Player(CANVAS_WIDTH, CANVAS_HEIGHT, ctx);
 
 // ENEMIES
 let enemiesArray = [];
-let = moveUp = false;
-
-class Enemies {
-  constructor(image, x, y) {
-    this.image = image;
-    this.x = x;
-    this.y = y;
-    this.w = 50;
-    this.h = 50;
-    this.dx = 0.996;
-  }
-
-  draw() {
-    ctx.drawImage(this.image, this.x, this.y, this.w, this.h);
-  }
-
-  detectWalls() {
-    //   Top wall
-    if (this.y < 0) {
-      this.y -= 10;
-
-      //   GAME OVER
-      gameOver = true;
-    }
-  }
-
-  detectCollision = (player) => {
-    let bottomOfBall = player.y + player.radius;
-    let topOfBall = player.y - player.radius;
-
-    let topOfObject = this.y;
-    let leftSideOfObject = this.x;
-    let rightSideOfObject = this.x + this.w;
-    let bottomOfObject = this.y + this.h;
-
-    if (
-      bottomOfBall >= topOfObject &&
-      topOfBall <= bottomOfObject &&
-      player.x >= leftSideOfObject &&
-      player.x + player.radius <= rightSideOfObject
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  update() {
-    this.y -= gameLevel;
-  }
-}
 
 for (let i = 0; i < 5; i++) {
-  //   enemiesArray.push(new Enemies(enemy2, 138 * i, 330));
-  enemiesArray.push(new Enemies(enemy2, 111 * i, 230));
+  enemiesArray.push(new Enemies(enemy2, 111 * i, 230, ctx));
 }
 
 const handleEnemies = (player) => {
   enemiesArray.forEach((enemy) => {
     if (enemy) {
       enemy.draw();
-      enemy.update();
+      enemy.update(gameLevel);
       enemy.detectWalls();
+      gameOver = enemy.wallDetected();
     }
   });
 
@@ -372,49 +140,24 @@ const handleEnemies = (player) => {
   }
 };
 
-// Game Over
-class GameOver {
-  constructor(message, background, centralSpace) {
-    this.message = message;
-    this.background = background;
-    this.centralSpace = centralSpace;
-  }
+const endOfGame = new GameOver(
+  'GAME OVER',
+  'black',
+  3,
+  CANVAS_WIDTH,
+  CANVAS_HEIGHT,
+  ctx
+);
+const winGame = new GameOver(
+  'YOU WIN!',
+  'salmon',
+  3,
+  CANVAS_WIDTH,
+  CANVAS_HEIGHT,
+  ctx
+);
 
-  draw() {
-    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    ctx.fillStyle = this.background;
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    ctx.font = '30px Arial';
-    ctx.fillStyle = 'white';
-    ctx.fillText(
-      this.message,
-      CANVAS_WIDTH / this.centralSpace,
-      CANVAS_HEIGHT / 2
-    );
-  }
-}
-
-const endOfGame = new GameOver('GAME OVER', 'black', 3);
-const winGame = new GameOver('YOU WIN!', 'salmon', 4);
-
-class Start {
-  constructor() {}
-
-  draw() {
-    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    ctx.fillStyle = 'orange';
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    ctx.font = '30px Arial';
-    ctx.fillStyle = 'white';
-    ctx.fillText(
-      'PRESS SPACE KEY TO START',
-      CANVAS_WIDTH / 12,
-      CANVAS_HEIGHT / 2
-    );
-  }
-}
-
-const startGame = new Start();
+const startGame = new Start(CANVAS_WIDTH, CANVAS_HEIGHT, ctx);
 
 const restartGame = () => {
   // Game will restart automatically after a few sec
@@ -438,6 +181,7 @@ const animation = () => {
     handleEnemies(player);
     player.draw();
     player.update(buildGround);
+    gameOver = player.detectEndOfGame();
     //   player.detectCollisionBar(buildGround);
     buildGround.detectCollision(player);
     //   Build the clouds that goes away when we start the game
@@ -451,5 +195,28 @@ const animation = () => {
 
   requestAnimationFrame(animation);
 };
+
+// EVENT LISTENERS
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'ArrowLeft') {
+    buildGround.moveLeft();
+  }
+
+  if (event.key === 'ArrowRight') {
+    buildGround.moveRight();
+  }
+
+  if (event.key === ' ') {
+    if (!gameOver) {
+      gameStarted = !gameStarted;
+
+      if (gameStarted) {
+        scoreParagraph.style.color = 'white';
+        spaceshipFlying.play();
+        audioBackground.play();
+      }
+    }
+  }
+});
 
 animation();
