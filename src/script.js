@@ -2,8 +2,8 @@ const canvas = document.querySelector('#canvas');
 const ctx = canvas.getContext('2d');
 ctx.canvas.width = window.innerWidth;
 ctx.canvas.height = window.innerHeight;
-const CANVAS_WIDTH = (canvas.width = 600);
-const CANVAS_HEIGHT = (canvas.height = 400);
+const CANVAS_WIDTH = (canvas.width = 500);
+const CANVAS_HEIGHT = (canvas.height = 300);
 
 // Select buttons on the home page
 const radioButtonLevel1 = document.getElementById('level1');
@@ -49,7 +49,7 @@ class FlyingImages {
     this.w = Math.floor(Math.random() * (maxW - minW + 1) + minW);
     this.h = Math.floor(Math.random() * (maxH - minH + 1) + minH);
     this.speed = Math.floor(Math.random() * (3 - 2 + 1) + 2);
-    this.x = 600;
+    this.x = CANVAS_WIDTH;
     this.y = Math.floor(Math.random() * (300 - 0 + 1) + 0);
     this.cloudImg = cloudImg;
   }
@@ -128,7 +128,7 @@ const layer1 = new Layer(backgroundLayer1, 0.5);
 class Ground {
   constructor() {
     this.x = 0;
-    this.y = 300;
+    this.y = CANVAS_HEIGHT / 1.5;
     this.speedX = 100;
     this.speedY = 100;
     this.w = 200;
@@ -257,7 +257,8 @@ class Player {
     let topOfBall = this.y - this.radius;
 
     // Hardcoded value due to complications on the ground image position
-    let topOfObject = paddleBar.y + 80;
+    // let topOfObject = paddleBar.y + 80;
+    let topOfObject = paddleBar.y + 77;
     let leftSideOfObject = paddleBar.x;
     let rightSideOfObject = paddleBar.x + paddleBar.w;
     let bottomOfObject = paddleBar.y + paddleBar.h;
@@ -293,7 +294,7 @@ class Enemies {
     this.y = y;
     this.w = 50;
     this.h = 50;
-    this.dx = 0.995;
+    this.dx = 0.996;
   }
 
   draw() {
@@ -337,7 +338,8 @@ class Enemies {
 }
 
 for (let i = 0; i < 5; i++) {
-  enemiesArray.push(new Enemies(enemy2, 138 * i, 330));
+  //   enemiesArray.push(new Enemies(enemy2, 138 * i, 330));
+  enemiesArray.push(new Enemies(enemy2, 111 * i, 230));
 }
 
 const handleEnemies = (player) => {
@@ -393,7 +395,7 @@ class GameOver {
 }
 
 const endOfGame = new GameOver('GAME OVER', 'black', 3);
-const winGame = new GameOver('YOU WIN!', 'salmon', 2.5);
+const winGame = new GameOver('YOU WIN!', 'salmon', 4);
 
 class Start {
   constructor() {}
@@ -406,7 +408,7 @@ class Start {
     ctx.fillStyle = 'white';
     ctx.fillText(
       'PRESS SPACE KEY TO START',
-      CANVAS_WIDTH / 6.5,
+      CANVAS_WIDTH / 12,
       CANVAS_HEIGHT / 2
     );
   }

@@ -23,8 +23,8 @@ body {
 }
 
 #canvas {
-  width: 600px;
-  height: 400px;
+  width: 500px;
+  height: 300px;
   border: 2px solid #8f8d8d;
   background-color: white;
 }
