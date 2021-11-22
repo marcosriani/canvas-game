@@ -1,4 +1,29 @@
 JavaScript Game
 
 Designing and building a functioning browser based game using HTML, CSS/SCSS
-and JavaScript.
+and JavaScript.'
+
+# Paddle game
+
+Paddle game is a JavaScript game built using the latest HTML canvas API technologies, to create an interactive animation.
+
+## How to get the project
+
+First, download the file from GitHub and start it on a local server.
+
+
+
+## Usage
+
+```
+User the space bar key to start the game
+
+Use the arrow keys to move the paddle to the right or to the left.
+
+You can also choose the level you want to play, the game consist of 3 levels.
+```
+
+## WIN OR LOSE
+You can win by killing all the spaceships.
+You might lose the game in case the ball goes outside the paddle or the spaceship classes the world borders.
+
